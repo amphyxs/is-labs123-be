@@ -1,15 +1,17 @@
 package com.example.prac.service.data;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
+
+import org.springframework.stereotype.Service;
+
 import com.example.prac.DTO.data.PersonDTO;
 import com.example.prac.mappers.Mapper;
 import com.example.prac.model.dataEntity.Person;
 import com.example.prac.repository.data.PersonRepository;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.StreamSupport;
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor

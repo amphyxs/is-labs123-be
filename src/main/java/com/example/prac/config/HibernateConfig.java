@@ -1,15 +1,15 @@
 package com.example.prac.config;
 
-import jakarta.persistence.EntityManagerFactory;
-import org.hibernate.SessionFactory;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import com.zaxxer.hikari.HikariDataSource;
 
-import javax.sql.DataSource;
-import java.util.Properties;
+import jakarta.persistence.EntityManagerFactory;
 
 @Configuration
 public class HibernateConfig {

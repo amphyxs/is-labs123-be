@@ -1,15 +1,31 @@
 package com.example.prac.model.dataEntity;
 
-import com.example.prac.model.authEntity.User;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.Data;
-
 import java.util.Date;
+
+import com.example.prac.model.authEntity.User;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 @Entity
 @Data
-@Table(name="dragons")
+@Table(name = "dragons")
 public class Dragon {
 
     @Id

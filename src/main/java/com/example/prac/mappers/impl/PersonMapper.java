@@ -1,11 +1,13 @@
 package com.example.prac.mappers.impl;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
+
 import com.example.prac.DTO.data.PersonDTO;
 import com.example.prac.mappers.Mapper;
 import com.example.prac.model.dataEntity.Person;
+
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor

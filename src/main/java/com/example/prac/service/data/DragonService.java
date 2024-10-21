@@ -1,5 +1,17 @@
 package com.example.prac.service.data;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.example.prac.DTO.data.DragonDTO;
 import com.example.prac.errorHandler.NotEnoughRightsException;
 import com.example.prac.mappers.Mapper;
@@ -11,19 +23,6 @@ import com.example.prac.repository.data.DragonRepository;
 import jakarta.persistence.ParameterMode;
 import lombok.AllArgsConstructor;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.StreamSupport;
-
-
 @Service
 @AllArgsConstructor
 public class DragonService {
@@ -31,7 +30,7 @@ public class DragonService {
     private final Mapper<Dragon, DragonDTO> dragonMapper;
     @Autowired
     private final SessionFactory sessionFactory;
-    
+
     public Integer getTotalAge() {
         try (Session session = sessionFactory.openSession()) {
             return session.createNativeQuery("SELECT * FROM total_age()", Integer.class).getSingleResult();
@@ -40,26 +39,28 @@ public class DragonService {
 
     public Optional<DragonDTO> getDragonWithGigachadKiller() {
         try (Session session = sessionFactory.openSession()) {
-            Long dragonID = session.createNativeQuery("SELECT * FROM get_dragon_id_with_gigachad_killer()", Long.class).getSingleResult();
+            Long dragonID = session.createNativeQuery("SELECT * FROM get_dragon_id_with_gigachad_killer()", Long.class)
+                    .getSingleResult();
 
             return findById(dragonID);
         }
     }
-    
+
     public Optional<DragonDTO> getDragonWithTheDeepestCave() {
         try (Session session = sessionFactory.openSession()) {
-            Long dragonID = session.createNativeQuery("SELECT * FROM get_dragon_with_the_deepest_cave()", Long.class).getSingleResult();
+            Long dragonID = session.createNativeQuery("SELECT * FROM get_dragon_with_the_deepest_cave()", Long.class)
+                    .getSingleResult();
 
             return findById(dragonID);
         }
     }
-    
+
     public List<DragonDTO> findDragonsByNameSubstring(String nameSubstring) {
         try (Session session = sessionFactory.openSession()) {
             List<Long> dragonIDs = session
-                .createNativeQuery("SELECT * FROM get_dragon_ids_by_name_substring(:nameSubstring)", Long.class)
-                .setParameter("nameSubstring", nameSubstring)
-                .list();
+                    .createNativeQuery("SELECT * FROM get_dragon_ids_by_name_substring(:nameSubstring)", Long.class)
+                    .setParameter("nameSubstring", nameSubstring)
+                    .list();
 
             return dragonIDs.stream().map((id) -> findById(id).get()).toList();
         }
@@ -69,14 +70,14 @@ public class DragonService {
         try (Session session = sessionFactory.openSession()) {
             var gangID = generateRandomDigitalID();
             session
-                .createStoredProcedureQuery("create_killers_gang")
-                .registerStoredProcedureParameter(1, String.class, ParameterMode.IN)
-                .registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
-                .registerStoredProcedureParameter(3, String.class, ParameterMode.IN)
-                .setParameter(1, generatePassportId(gangID))
-                .setParameter(2, generatePassportId(gangID))
-                .setParameter(3, generatePassportId(gangID))
-                .execute();
+                    .createStoredProcedureQuery("create_killers_gang")
+                    .registerStoredProcedureParameter(1, String.class, ParameterMode.IN)
+                    .registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
+                    .registerStoredProcedureParameter(3, String.class, ParameterMode.IN)
+                    .setParameter(1, generatePassportId(gangID))
+                    .setParameter(2, generatePassportId(gangID))
+                    .setParameter(3, generatePassportId(gangID))
+                    .execute();
         }
     }
 
@@ -108,7 +109,7 @@ public class DragonService {
             if (!checkUserOwnsDragon(getCurrentUser(), existingDragon)) {
                 throw new NotEnoughRightsException("User hasn't enough right to update this object");
             }
-            
+
             Dragon dragonUpdate = dragonMapper.mapFrom(dragonDTO);
 
             Optional.ofNullable(dragonUpdate.getName()).ifPresent(existingDragon::setName);
@@ -127,10 +128,8 @@ public class DragonService {
 
     public void delete(Long dragonId) {
         dragonRepository.findById(dragonId).ifPresentOrElse(dragon -> {
-            if (
-                (getCurrentUser().getRole() == Role.ADMIN && dragon.getCanBeEditedByAdmin()) || 
-                checkUserOwnsDragon(getCurrentUser(), dragon)
-            ) {
+            if ((getCurrentUser().getRole() == Role.ADMIN && dragon.getCanBeEditedByAdmin()) ||
+                    checkUserOwnsDragon(getCurrentUser(), dragon)) {
                 dragonRepository.deleteById(dragonId);
             } else {
                 throw new NotEnoughRightsException("User hasn't enough right to delete this object");
@@ -141,7 +140,7 @@ public class DragonService {
     private boolean checkUserOwnsDragon(User user, Dragon dragon) {
         return getCurrentUser().getId() == dragon.getDragonOwner().getId();
     }
-    
+
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (User) authentication.getPrincipal();
@@ -152,6 +151,6 @@ public class DragonService {
     }
 
     private int generateRandomDigitalID() {
-        return (int)(Math.random() * 10000);
+        return (int) (Math.random() * 10000);
     }
 }

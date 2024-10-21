@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 
 import com.example.prac.model.dataEntity.Dragon;
 
-
 @Repository
 public interface DragonRepository extends JpaRepository<Dragon, Long> {
 }

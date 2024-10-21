@@ -1,6 +1,5 @@
 package com.example.prac.service.auth;
 
-
 import com.example.prac.model.authEntity.AdminRequest;
 import com.example.prac.model.authEntity.Role;
 import com.example.prac.model.authEntity.User;
@@ -36,14 +35,12 @@ public class AdminRequestService {
         return adminRequestRepository.findById(id);
     }
 
-
-    @Transactional(readOnly = true) // TODO может стоит убрать эту аннотацию
+    @Transactional(readOnly = true)
     public List<AdminRequest> getAllAdminRequests() {
         return (List<AdminRequest>) adminRequestRepository.findAll();
     }
 
-
-    public boolean approveRequest(Long requestId) throws Exception {
+    public boolean approveRequest(Long requestId) {
         Optional<AdminRequest> adminRequestOptional = adminRequestRepository.findById(requestId);
 
         if (adminRequestOptional.isEmpty())

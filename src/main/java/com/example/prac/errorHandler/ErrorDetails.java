@@ -1,10 +1,10 @@
 package com.example.prac.errorHandler;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Date;
 
 @Setter
 @Getter

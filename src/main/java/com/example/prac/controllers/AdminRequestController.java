@@ -1,18 +1,25 @@
 package com.example.prac.controllers;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.prac.DTO.admin.AdminRequestDTO;
 import com.example.prac.mappers.impl.AdminRequestMapper;
 import com.example.prac.model.authEntity.AdminRequest;
 import com.example.prac.model.authEntity.User;
 import com.example.prac.service.auth.AdminRequestService;
-import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
@@ -22,7 +29,7 @@ public class AdminRequestController {
     private final AdminRequestService adminRequestService;
     private final AdminRequestMapper adminRequestMapper;
 
-    @PostMapping("/request") // FIXME: возвращает 403 даже с токеном
+    @PostMapping("/request")
     public ResponseEntity<String> requestAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
@@ -72,12 +79,12 @@ public class AdminRequestController {
         if (currentUser.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ADMIN"))) {
 
-
             boolean isApproved = adminRequestService.approveRequest(id);
             if (isApproved) {
                 return ResponseEntity.ok("Запрос успешно одобрен.");
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Запрос уже одобрен этим админом или не найден.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Запрос уже одобрен этим админом или не найден.");
             }
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

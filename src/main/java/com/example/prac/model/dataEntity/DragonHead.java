@@ -1,14 +1,17 @@
 package com.example.prac.model.dataEntity;
 
-import com.example.prac.model.authEntity.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 @Entity
 @Data
-@Table(name="dragon_heads")
+@Table(name = "dragon_heads")
 public class DragonHead {
 
     @Id

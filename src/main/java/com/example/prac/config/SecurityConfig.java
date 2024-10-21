@@ -2,7 +2,6 @@ package com.example.prac.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,7 +33,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/admin-requests/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin-requests/request").hasAuthority("ROLE_USER")
-                        
+
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -43,15 +42,15 @@ public class SecurityConfig {
 
         return http.build();
     }
-    
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:4200"); // Local Dev Server for FE
         configuration.addAllowedOrigin("http://localhost:4201"); // Local Nginx for FE
-        configuration.addAllowedMethod("*");  
-        configuration.addAllowedHeader("*");  
-        configuration.setAllowCredentials(true);  
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

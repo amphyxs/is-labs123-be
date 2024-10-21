@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 public class SpecialCommandsController {
 
     private final DragonService dragonService;
-    
+
     @GetMapping("/sum-dragon-ages")
     public ResponseEntity<Integer> getTotalAge() {
         return ResponseEntity.ok(dragonService.getTotalAge());
@@ -48,4 +48,3 @@ public class SpecialCommandsController {
         return ResponseEntity.ok().build();
     }
 }
-
