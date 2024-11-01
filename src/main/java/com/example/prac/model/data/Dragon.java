@@ -1,8 +1,8 @@
-package com.example.prac.model.dataEntity;
+package com.example.prac.model.data;
 
 import java.util.Date;
 
-import com.example.prac.model.authEntity.User;
+import com.example.prac.model.auth.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

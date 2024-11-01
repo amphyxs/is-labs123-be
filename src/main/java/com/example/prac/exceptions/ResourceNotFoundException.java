@@ -1,4 +1,4 @@
-package com.example.prac.errorHandler;
+package com.example.prac.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

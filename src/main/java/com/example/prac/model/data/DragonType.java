@@ -1,4 +1,4 @@
-package com.example.prac.model.dataEntity;
+package com.example.prac.model.data;
 
 public enum DragonType {
     UNDERGROUND, AIR, FIRE;

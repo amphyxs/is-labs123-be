@@ -9,17 +9,16 @@ import java.util.function.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.example.prac.model.authEntity.User;
+import com.example.prac.model.auth.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
-    private final String SECRET = "01ebc0bb5e1c88a20643ecf10712e286a367be48756f031df0b51e70911ed542";
+    private static final String SECRET = "01ebc0bb5e1c88a20643ecf10712e286a367be48756f031df0b51e70911ed542";
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

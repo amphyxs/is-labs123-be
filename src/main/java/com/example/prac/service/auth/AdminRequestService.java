@@ -1,8 +1,8 @@
 package com.example.prac.service.auth;
 
-import com.example.prac.model.authEntity.AdminRequest;
-import com.example.prac.model.authEntity.Role;
-import com.example.prac.model.authEntity.User;
+import com.example.prac.model.auth.AdminRequest;
+import com.example.prac.model.auth.Role;
+import com.example.prac.model.auth.User;
 import com.example.prac.repository.auth.AdminRequestRepository;
 import com.example.prac.repository.auth.UserRepository;
 import lombok.RequiredArgsConstructor;

@@ -12,12 +12,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.example.prac.DTO.data.DragonDTO;
-import com.example.prac.errorHandler.NotEnoughRightsException;
+import com.example.prac.dto.data.DragonDTO;
+import com.example.prac.exceptions.NotEnoughRightsException;
 import com.example.prac.mappers.Mapper;
-import com.example.prac.model.authEntity.Role;
-import com.example.prac.model.authEntity.User;
-import com.example.prac.model.dataEntity.Dragon;
+import com.example.prac.model.auth.Role;
+import com.example.prac.model.auth.User;
+import com.example.prac.model.data.Dragon;
 import com.example.prac.repository.data.DragonRepository;
 
 import jakarta.persistence.ParameterMode;

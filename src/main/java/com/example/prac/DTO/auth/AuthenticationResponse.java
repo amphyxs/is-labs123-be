@@ -1,6 +1,6 @@
-package com.example.prac.DTO.auth;
+package com.example.prac.dto.auth;
 
-import com.example.prac.model.authEntity.Role;
+import com.example.prac.model.auth.Role;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

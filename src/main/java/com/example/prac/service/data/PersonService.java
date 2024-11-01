@@ -6,9 +6,9 @@ import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
 
-import com.example.prac.DTO.data.PersonDTO;
+import com.example.prac.dto.data.PersonDTO;
 import com.example.prac.mappers.Mapper;
-import com.example.prac.model.dataEntity.Person;
+import com.example.prac.model.data.Person;
 import com.example.prac.repository.data.PersonRepository;
 
 import lombok.AllArgsConstructor;

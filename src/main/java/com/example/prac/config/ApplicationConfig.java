@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.example.prac.exceptions.PasswordHashingException;
 import com.example.prac.repository.auth.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -61,7 +62,7 @@ public class ApplicationConfig {
                     }
                     return sb.toString();
                 } catch (NoSuchAlgorithmException e) {
-                    throw new RuntimeException("Error while hashing password", e);
+                    throw new PasswordHashingException();
                 }
             }
 

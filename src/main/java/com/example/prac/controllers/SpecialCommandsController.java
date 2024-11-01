@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.prac.DTO.data.DragonDTO;
+import com.example.prac.dto.data.DragonDTO;
 import com.example.prac.service.data.DragonService;
 
 import lombok.AllArgsConstructor;

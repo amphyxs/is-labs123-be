@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.prac.DTO.admin.AdminRequestDTO;
+import com.example.prac.dto.admin.AdminRequestDTO;
 import com.example.prac.mappers.impl.AdminRequestMapper;
-import com.example.prac.model.authEntity.AdminRequest;
-import com.example.prac.model.authEntity.User;
+import com.example.prac.model.auth.AdminRequest;
+import com.example.prac.model.auth.User;
 import com.example.prac.service.auth.AdminRequestService;
 
 import lombok.AllArgsConstructor;
@@ -49,10 +49,7 @@ public class AdminRequestController {
         User currentUser = (User) authentication.getPrincipal();
         Optional<AdminRequest> existingRequest = adminRequestService.findByRequester(currentUser);
 
-        if (existingRequest.isPresent()) {
-            return ResponseEntity.ok(true);
-        }
-        return ResponseEntity.ok(false);
+        return ResponseEntity.ok(existingRequest.isPresent());
     }
 
     @GetMapping("/all")
@@ -72,7 +69,7 @@ public class AdminRequestController {
     }
 
     @PostMapping("/{id}/approve")
-    public ResponseEntity<String> approveRequest(@PathVariable Long id) throws Exception {
+    public ResponseEntity<String> approveRequest(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
 

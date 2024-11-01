@@ -1,11 +1,12 @@
-package com.example.prac.DTO.data;
+package com.example.prac.dto.data;
 
-import com.example.prac.model.dataEntity.Color;
-import com.example.prac.model.dataEntity.DragonCharacter;
-import com.example.prac.model.dataEntity.DragonType;
 import lombok.Data;
 
 import java.util.Date;
+
+import com.example.prac.model.data.Color;
+import com.example.prac.model.data.DragonCharacter;
+import com.example.prac.model.data.DragonType;
 
 @Data
 public class DragonDTO {

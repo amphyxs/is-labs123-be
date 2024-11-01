@@ -1,4 +1,4 @@
-package com.example.prac.DTO.admin;
+package com.example.prac.dto.admin;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.example.prac.errorHandler;
+package com.example.prac.exceptions;
 
 import java.util.Date;
 

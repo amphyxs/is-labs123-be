@@ -3,9 +3,9 @@ package com.example.prac.mappers.impl;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-import com.example.prac.DTO.data.DragonDTO;
+import com.example.prac.dto.data.DragonDTO;
 import com.example.prac.mappers.Mapper;
-import com.example.prac.model.dataEntity.Dragon;
+import com.example.prac.model.data.Dragon;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,12 +15,12 @@ public class DragonMapper implements Mapper<Dragon, DragonDTO> {
     private final ModelMapper modelMapper;
 
     @Override
-    public DragonDTO mapTo(Dragon Dragon) {
-        return modelMapper.map(Dragon, DragonDTO.class);
+    public DragonDTO mapTo(Dragon dragon) {
+        return modelMapper.map(dragon, DragonDTO.class);
     }
 
     @Override
-    public Dragon mapFrom(DragonDTO DragonDTO) {
-        return modelMapper.map(DragonDTO, Dragon.class);
+    public Dragon mapFrom(DragonDTO dragonDTO) {
+        return modelMapper.map(dragonDTO, Dragon.class);
     }
 }

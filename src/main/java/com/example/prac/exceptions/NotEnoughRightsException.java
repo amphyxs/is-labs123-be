@@ -1,4 +1,4 @@
-package com.example.prac.errorHandler;
+package com.example.prac.exceptions;
 
 public class NotEnoughRightsException extends RuntimeException {
     public NotEnoughRightsException(String message) {

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.prac.DTO.data.PersonDTO;
+import com.example.prac.dto.data.PersonDTO;
 import com.example.prac.service.data.PersonService;
 
 import lombok.AllArgsConstructor;

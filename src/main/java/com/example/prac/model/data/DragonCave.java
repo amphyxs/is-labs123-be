@@ -1,4 +1,4 @@
-package com.example.prac.model.dataEntity;
+package com.example.prac.model.data;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,15 +11,15 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "dragon_heads")
-public class DragonHead {
+@Table(name = "dragon_caves")
+public class DragonCave {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true)
     private long id;
 
-    @Min(value = 1, message = "Size must be greater than 0")
-    @Column(name = "size", nullable = false)
-    private long size;
+    @Min(value = 1, message = "Number of treasures must be greater than 0")
+    @Column(name = "number_of_treasures")
+    private Long numberOfTreasures;
 }

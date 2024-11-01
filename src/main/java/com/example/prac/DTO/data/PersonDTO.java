@@ -1,9 +1,10 @@
-package com.example.prac.DTO.data;
+package com.example.prac.dto.data;
 
-import com.example.prac.model.dataEntity.Color;
 import lombok.Data;
 
 import java.util.Date;
+
+import com.example.prac.model.data.Color;
 
 @Data
 public class PersonDTO {

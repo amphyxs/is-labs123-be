@@ -6,12 +6,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.prac.DTO.auth.AuthenticationRequest;
-import com.example.prac.DTO.auth.AuthenticationResponse;
-import com.example.prac.DTO.auth.RegisterRequest;
-import com.example.prac.errorHandler.UserAlreadyExistsException;
-import com.example.prac.model.authEntity.Role;
-import com.example.prac.model.authEntity.User;
+import com.example.prac.dto.auth.AuthenticationRequest;
+import com.example.prac.dto.auth.AuthenticationResponse;
+import com.example.prac.dto.auth.RegisterRequest;
+import com.example.prac.exceptions.UserAlreadyExistsException;
+import com.example.prac.model.auth.Role;
+import com.example.prac.model.auth.User;
 import com.example.prac.repository.auth.UserRepository;
 
 import lombok.RequiredArgsConstructor;

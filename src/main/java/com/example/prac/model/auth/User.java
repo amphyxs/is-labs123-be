@@ -1,4 +1,4 @@
-package com.example.prac.model.authEntity;
+package com.example.prac.model.auth;
 
 import java.util.Collection;
 import java.util.List;
