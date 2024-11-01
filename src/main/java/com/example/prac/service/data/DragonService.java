@@ -7,6 +7,7 @@ import java.util.stream.StreamSupport;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.procedure.ProcedureCall;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,8 +29,15 @@ import lombok.AllArgsConstructor;
 public class DragonService {
     private final DragonRepository dragonRepository;
     private final Mapper<Dragon, DragonDTO> dragonMapper;
-    @Autowired
     private final SessionFactory sessionFactory;
+
+    @Autowired
+    public DragonService(SessionFactory sessionFactory, Mapper<Dragon, DragonDTO> dragonMapper,
+            DragonRepository dragonRepository) {
+        this.sessionFactory = sessionFactory;
+        this.dragonRepository = dragonRepository;
+        this.dragonMapper = dragonMapper;
+    }
 
     public Integer getTotalAge() {
         try (Session session = sessionFactory.openSession()) {
@@ -62,15 +70,14 @@ public class DragonService {
                     .setParameter("nameSubstring", nameSubstring)
                     .list();
 
-            return dragonIDs.stream().map((id) -> findById(id).get()).toList();
+            return dragonIDs.stream().map(id -> findById(id).get()).toList();
         }
     }
 
     public void createKillersGang() {
-        try (Session session = sessionFactory.openSession()) {
+        try (ProcedureCall call = sessionFactory.openSession().createStoredProcedureCall("create_killers_gang")) {
             var gangID = generateRandomDigitalID();
-            session
-                    .createStoredProcedureQuery("create_killers_gang")
+            call
                     .registerStoredProcedureParameter(1, String.class, ParameterMode.IN)
                     .registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
                     .registerStoredProcedureParameter(3, String.class, ParameterMode.IN)
@@ -106,7 +113,7 @@ public class DragonService {
     public DragonDTO partialUpdate(Long dragonId, DragonDTO dragonDTO) {
         dragonDTO.setId(dragonId);
         return dragonRepository.findById(dragonId).map(existingDragon -> {
-            if (!checkUserOwnsDragon(getCurrentUser(), existingDragon)) {
+            if (!checkUserOwnsDragon(existingDragon)) {
                 throw new NotEnoughRightsException("User hasn't enough right to update this object");
             }
 
@@ -129,7 +136,7 @@ public class DragonService {
     public void delete(Long dragonId) {
         dragonRepository.findById(dragonId).ifPresentOrElse(dragon -> {
             if ((getCurrentUser().getRole() == Role.ADMIN && dragon.getCanBeEditedByAdmin()) ||
-                    checkUserOwnsDragon(getCurrentUser(), dragon)) {
+                    checkUserOwnsDragon(dragon)) {
                 dragonRepository.deleteById(dragonId);
             } else {
                 throw new NotEnoughRightsException("User hasn't enough right to delete this object");
@@ -137,8 +144,8 @@ public class DragonService {
         }, () -> new RuntimeException("Dragon doesn't exist"));
     }
 
-    private boolean checkUserOwnsDragon(User user, Dragon dragon) {
-        return getCurrentUser().getId() == dragon.getDragonOwner().getId();
+    private boolean checkUserOwnsDragon(Dragon dragon) {
+        return getCurrentUser().getId().equals(dragon.getDragonOwner().getId());
     }
 
     private User getCurrentUser() {
