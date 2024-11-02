@@ -3,6 +3,7 @@ package com.example.prac.controllers;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.prac.dto.data.DragonDTO;
+import com.example.prac.exceptions.NotEnoughRightsException;
+import com.example.prac.exceptions.ResourceNotFoundException;
 import com.example.prac.service.data.DragonService;
 
 import lombok.AllArgsConstructor;
@@ -45,22 +48,28 @@ public class DragonController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<DragonDTO> updateDragonPartially(@PathVariable Long id, @RequestBody DragonDTO dragonDTO) {
+    public ResponseEntity<Object> updateDragonPartially(@PathVariable Long id, @RequestBody DragonDTO dragonDTO) {
         try {
             DragonDTO updatedDragon = dragonService.partialUpdate(id, dragonDTO);
+
             return ResponseEntity.ok(updatedDragon);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (NotEnoughRightsException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDragon(@PathVariable Long id) {
-        if (dragonService.isExists(id)) {
+    public ResponseEntity<Object> deleteDragon(@PathVariable Long id) {
+        try {
             dragonService.delete(id);
+
             return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (NotEnoughRightsException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 }

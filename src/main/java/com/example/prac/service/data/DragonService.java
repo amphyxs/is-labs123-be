@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.prac.dto.data.DragonDTO;
 import com.example.prac.exceptions.NotEnoughRightsException;
+import com.example.prac.exceptions.ResourceNotFoundException;
 import com.example.prac.mappers.Mapper;
 import com.example.prac.model.auth.Role;
 import com.example.prac.model.auth.User;
@@ -132,7 +133,7 @@ public class DragonService {
             Optional.ofNullable(dragonUpdate.getHead()).ifPresent(existingDragon::setHead);
 
             return dragonMapper.mapTo(dragonRepository.save(existingDragon));
-        }).orElseThrow(() -> new RuntimeException("Dragon doesn't exist"));
+        }).orElseThrow(() -> new ResourceNotFoundException(Dragon.class));
     }
 
     public void delete(Long dragonId) {
@@ -143,7 +144,7 @@ public class DragonService {
             } else {
                 throw new NotEnoughRightsException("User hasn't enough right to delete this object");
             }
-        }, () -> new RuntimeException("Dragon doesn't exist"));
+        }, () -> new ResourceNotFoundException(Dragon.class));
     }
 
     private boolean checkUserOwnsDragon(Dragon dragon) {
