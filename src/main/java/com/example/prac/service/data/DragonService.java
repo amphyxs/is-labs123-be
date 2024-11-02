@@ -3,6 +3,7 @@ package com.example.prac.service.data;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.StreamSupport;
 
 import org.hibernate.Session;
@@ -30,6 +31,7 @@ public class DragonService {
     private final DragonRepository dragonRepository;
     private final Mapper<Dragon, DragonDTO> dragonMapper;
     private final SessionFactory sessionFactory;
+    private final Random r = new Random();
 
     @Autowired
     public DragonService(SessionFactory sessionFactory, Mapper<Dragon, DragonDTO> dragonMapper,
@@ -158,6 +160,6 @@ public class DragonService {
     }
 
     private int generateRandomDigitalID() {
-        return (int) (Math.random() * 10000);
+        return r.nextInt(1000, 9999);
     }
 }
