@@ -15,7 +15,8 @@ BEGIN
     SELECT d.id AS dragon_id
     FROM dragons d
     JOIN people p ON d.killer_id = p.id
-    WHERE p.height = (SELECT MAX(height) FROM people);
+    ORDER BY p.height DESC
+    LIMIT 1;
 END;
 $$ LANGUAGE plpgsql;
 
