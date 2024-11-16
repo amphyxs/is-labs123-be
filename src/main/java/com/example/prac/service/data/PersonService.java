@@ -7,6 +7,7 @@ import java.util.stream.StreamSupport;
 import org.springframework.stereotype.Service;
 
 import com.example.prac.dto.data.PersonDTO;
+import com.example.prac.exceptions.ResourceNotFoundException;
 import com.example.prac.mappers.Mapper;
 import com.example.prac.model.data.Person;
 import com.example.prac.repository.data.PersonRepository;
@@ -50,7 +51,7 @@ public class PersonService {
             Optional.of(personDTO.getHeight()).ifPresent(existingPersonDto::setHeight);
             Optional.ofNullable(personDTO.getPassportID()).ifPresent(existingPersonDto::setPassportID);
             return personMapper.mapTo(personRepository.save(personMapper.mapFrom(existingPersonDto)));
-        }).orElseThrow(() -> new RuntimeException("Person doesn't exist"));
+        }).orElseThrow(() -> new ResourceNotFoundException(Person.class));
     }
 
     public void delete(Long personId) {
