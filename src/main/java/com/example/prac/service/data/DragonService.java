@@ -148,7 +148,7 @@ public class DragonService {
     }
 
     private boolean checkUserOwnsDragon(Dragon dragon) {
-        return getCurrentUser().getId().equals(dragon.getDragonOwner().getId());
+        return getCurrentUser().getUsername().equals(dragon.getDragonOwner().getUsername());
     }
 
     private User getCurrentUser() {

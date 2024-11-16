@@ -32,11 +32,7 @@ import lombok.Setter;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq_generator")
-    @SequenceGenerator(name = "users_seq_generator", sequenceName = "users_seq", allocationSize = 1)
-    private Long id;
-
-    @Column(name = "username", nullable = false, length = 100)
+    @Column(name = "username", length = 100)
     private String username;
 
     @Column(name = "password", nullable = false, length = 255)

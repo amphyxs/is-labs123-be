@@ -78,7 +78,7 @@ public class Dragon {
     private DragonHead head;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "owner_id", referencedColumnName = "username", nullable = false)
     @NotNull(message = "Owner cannot be null")
     private User dragonOwner;
 

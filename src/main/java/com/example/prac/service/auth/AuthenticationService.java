@@ -25,7 +25,7 @@ public class AuthenticationService {
         private final AuthenticationManager authenticationManager;
 
         public AuthenticationResponse register(RegisterRequest request) {
-                boolean userExists = userRepository.existsByUsername(request.getUsername());
+                boolean userExists = userRepository.existsById(request.getUsername());
 
                 if (userExists) {
                         throw new UserAlreadyExistsException("A user with the same username already exists");
@@ -51,7 +51,7 @@ public class AuthenticationService {
                                 new UsernamePasswordAuthenticationToken(
                                                 request.getUsername(),
                                                 request.getPassword()));
-                var user = userRepository.findByUsername(request.getUsername())
+                var user = userRepository.findById(request.getUsername())
                                 .orElseThrow(() -> new UsernameNotFoundException("user not found"));
                 var token = jwtService.generateToken(user);
                 Role role = user.getRole();

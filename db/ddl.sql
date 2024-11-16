@@ -1,16 +1,15 @@
 CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,                          -- Auto-incrementing primary key
-    username VARCHAR(100) NOT NULL,                 -- Username column with a max length of 100, cannot be null
+    username VARCHAR(100) NOT NULL UNIQUE,                 -- Username column with a max length of 100, cannot be null
     password VARCHAR(255) NOT NULL,                 -- Password column with a max length of 255, cannot be null
     role VARCHAR(20) NOT NULL                       -- Role column, storing string representation of the enum
 );
 
 CREATE TABLE IF NOT EXISTS admin_request (
     id SERIAL PRIMARY KEY,                              -- Auto-incrementing primary key
-    requester_id BIGINT,                                -- Foreign key referencing the User entity
+    requester_id VARCHAR(100),                                -- Foreign key referencing the User entity
     is_approved BOOLEAN NOT NULL,                       -- Boolean column to track approval status
     CONSTRAINT fk_requester FOREIGN KEY (requester_id)  -- Foreign key constraint
-    REFERENCES users (id) ON DELETE SET NULL            -- Set requester_id to NULL if the user is deleted
+    REFERENCES users (username) ON DELETE SET NULL            -- Set requester_id to NULL if the user is deleted
 );
 
 -- Create the 'coordinates' table
@@ -67,7 +66,7 @@ CREATE TABLE IF NOT EXISTS dragons (
     type VARCHAR(255),                                      -- Type column, stored as a string, can be NULL
     character VARCHAR(255) NOT NULL,                        -- Character column, stored as a string, cannot be NULL
     head_id BIGINT,                                         -- Foreign key referencing the 'dragon_heads' table, can be NULL
-    owner_id BIGINT NOT NULL,                               -- Foreign key referencing the 'users' table, cannot be NULL
+    owner_id VARCHAR(100) NOT NULL,                               -- Foreign key referencing the 'users' table, cannot be NULL
     can_be_edited_by_admin BOOLEAN NOT NULL,
 
     CONSTRAINT fk_coordinates FOREIGN KEY (coordinates_id)   -- Foreign key constraint on coordinates_id
@@ -79,7 +78,7 @@ CREATE TABLE IF NOT EXISTS dragons (
     CONSTRAINT fk_head FOREIGN KEY (head_id)                 -- Foreign key constraint on head_id
         REFERENCES dragon_heads (id) ON DELETE SET NULL,     -- If head is deleted, set head_id to NULL
     CONSTRAINT fk_owner FOREIGN KEY (owner_id)               -- Foreign key constraint on owner_id
-        REFERENCES users (id) ON DELETE RESTRICT             -- Prevent deletion of owner if referenced
+        REFERENCES users (username) ON DELETE RESTRICT             -- Prevent deletion of owner if referenced
 );
 
 CREATE SEQUENCE IF NOT EXISTS dragons_seq START WITH 1 INCREMENT BY 1;

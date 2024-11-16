@@ -1,7 +1,6 @@
 package com.example.prac.repository.auth;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -11,11 +10,7 @@ import com.example.prac.model.auth.Role;
 import com.example.prac.model.auth.User;
 
 @Repository
-public interface UserRepository extends CrudRepository<User, Long>,
-        PagingAndSortingRepository<User, Long> {
-    boolean existsByUsername(String username);
-
-    Optional<User> findByUsername(String username);
-
+public interface UserRepository extends CrudRepository<User, String>,
+        PagingAndSortingRepository<User, String> {
     List<User> findByRole(Role role);
 }

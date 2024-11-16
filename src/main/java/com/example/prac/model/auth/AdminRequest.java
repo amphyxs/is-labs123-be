@@ -14,7 +14,7 @@ public class AdminRequest {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
+    @JoinColumn(name = "requester_id", referencedColumnName = "username", nullable = false)
     private User requester;
 
     @Column(name = "is_approved", nullable = false)
