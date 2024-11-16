@@ -38,7 +38,8 @@ BEGIN
     SELECT d.id AS dragon_id
     FROM dragons d
     JOIN dragon_caves c ON d.cave_id = c.id
-    WHERE c.number_of_treasures = (SELECT MAX(number_of_treasures) FROM dragon_caves);
+    ORDER BY c.number_of_treasures DESC
+    LIMIT 1;
 END;
 $$ LANGUAGE plpgsql;
 
