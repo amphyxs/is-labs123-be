@@ -13,8 +13,8 @@ public class AdminRequest {
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "requester_id", referencedColumnName = "id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
     private User requester;
 
     @Column(name = "is_approved", nullable = false)

@@ -6,6 +6,8 @@ import com.example.prac.model.auth.User;
 import com.example.prac.repository.auth.AdminRequestRepository;
 import com.example.prac.repository.auth.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
