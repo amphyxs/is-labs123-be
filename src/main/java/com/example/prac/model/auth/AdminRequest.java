@@ -9,8 +9,8 @@ import lombok.Data;
 public class AdminRequest {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "admin_requests_seq_generator")
+    @SequenceGenerator(name = "admin_requests_seq_generator", sequenceName = "admin_requests_seq", allocationSize = 1)
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)

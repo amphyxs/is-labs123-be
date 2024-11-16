@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -29,8 +30,8 @@ import lombok.Data;
 public class Dragon {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dragons_seq_generator")
+    @SequenceGenerator(name = "dragons_seq_generator", sequenceName = "dragons_seq", allocationSize = 1)
     private long id;
 
     @NotBlank(message = "Name cannot be null or empty")

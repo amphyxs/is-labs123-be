@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
@@ -15,8 +16,8 @@ import lombok.Data;
 public class DragonHead {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dragon_heads_seq_generator")
+    @SequenceGenerator(name = "dragon_heads_seq_generator", sequenceName = "dragon_heads_seq", allocationSize = 1)
     private long id;
 
     @Min(value = 1, message = "Size must be greater than 0")
