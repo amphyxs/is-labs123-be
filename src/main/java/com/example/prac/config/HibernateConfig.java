@@ -4,12 +4,11 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-
-import jakarta.persistence.EntityManagerFactory;
 
 @Configuration
 public class HibernateConfig {
@@ -34,8 +33,9 @@ public class HibernateConfig {
         return properties;
     }
 
+    // HibNoJPA: Используем Hibernate'вский SessionFactory
     @Bean
-    public EntityManagerFactory entityManagerFactory(LocalSessionFactoryBean sessionFactory) {
+    public SessionFactory entityManagerFactory(LocalSessionFactoryBean sessionFactory) {
         return sessionFactory.getObject();
     }
 }
