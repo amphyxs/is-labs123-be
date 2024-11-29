@@ -9,15 +9,26 @@ import java.util.stream.StreamSupport;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.procedure.ProcedureCall;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.prac.dto.data.DragonDTO;
+import com.example.prac.dto.data.OwnerDTO;
 import com.example.prac.exceptions.NotEnoughRightsException;
 import com.example.prac.exceptions.ResourceNotFoundException;
 import com.example.prac.mappers.Mapper;
 import com.example.prac.model.auth.Role;
+import com.example.prac.model.data.Coordinates;
 import com.example.prac.model.data.Dragon;
+import com.example.prac.model.data.DragonCave;
+import com.example.prac.model.data.DragonHead;
+import com.example.prac.model.data.Person;
+import com.example.prac.repository.data.CoordinatesRepository;
+import com.example.prac.repository.data.DragonCaveRepository;
+import com.example.prac.repository.data.DragonHeadRepository;
 import com.example.prac.repository.data.DragonRepository;
+import com.example.prac.repository.data.PersonRepository;
 import com.example.prac.service.auth.AuthenticationService;
 
 import jakarta.persistence.ParameterMode;
@@ -30,6 +41,11 @@ public class DragonService {
     private final Mapper<Dragon, DragonDTO> dragonMapper;
     private final SessionFactory sessionFactory;
     private final AuthenticationService authenticationService;
+    private final CoordinatesRepository coordinatesRepository;
+    private final DragonCaveRepository dragonCaveRepository;
+    private final DragonHeadRepository dragonHeadRepository;
+    private final PersonRepository personRepository;
+    private final ModelMapper modelMapper;
     private final Random r = new Random();
 
     public Integer getTotalAge() {
@@ -135,6 +151,34 @@ public class DragonService {
                 throw new NotEnoughRightsException("User hasn't enough right to delete this object");
             }
         }, () -> new ResourceNotFoundException(Dragon.class));
+    }
+
+    @Transactional
+    public void saveImportedDragonsList(List<DragonDTO> dragons) {
+        dragons.forEach(d -> {
+            var coordinates = modelMapper.map(d.getCoordinates(), Coordinates.class);
+            coordinatesRepository.save(coordinates);
+            d.getCoordinates().setId(coordinates.getId());
+
+            var cave = modelMapper.map(d.getCave(), DragonCave.class);
+            dragonCaveRepository.save(cave);
+            d.getCave().setId(cave.getId());
+
+            var head = modelMapper.map(d.getHead(), DragonHead.class);
+            dragonHeadRepository.save(head);
+            d.getHead().setId(head.getId());
+
+            if (d.getKiller() != null) {
+                var person = modelMapper.map(d.getKiller(), Person.class);
+                personRepository.save(person);
+                d.getKiller().setId(person.getId());
+            }
+
+            var userDTO = modelMapper.map(authenticationService.getCurrentUser(), OwnerDTO.class);
+            d.setOwner(userDTO);
+
+            save(d);
+        });
     }
 
     private boolean checkUserOwnsDragon(Dragon dragon) {
