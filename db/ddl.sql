@@ -81,6 +81,14 @@ CREATE TABLE IF NOT EXISTS dragons (
         REFERENCES users (username) ON DELETE RESTRICT             -- Prevent deletion of owner if referenced
 );
 
+CREATE TABLE IF NOT EXISTS imports (
+    id SERIAL PRIMARY KEY,
+    status VARCHAR(50) NOT NULL, -- Assuming ImportStatus is stored as a string
+    owner_id VARCHAR(100) NOT NULL,    -- Foreign key referencing the User table
+    number_of_added_objects INT NULL, -- Nullable in case of failure
+    CONSTRAINT fk_owner FOREIGN KEY (owner_id) REFERENCES users(username)
+);
+
 CREATE SEQUENCE IF NOT EXISTS dragons_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS coordinates_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS dragon_caves_seq START WITH 1 INCREMENT BY 1;

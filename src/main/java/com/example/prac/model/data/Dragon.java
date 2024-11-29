@@ -53,7 +53,7 @@ public class Dragon {
     private DragonCave cave;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "killer_id", referencedColumnName = "id")
+    @JoinColumn(name = "killer_id", referencedColumnName = "id") 
     private Person killer;
 
     @Min(value = 1, message = "Age must be greater than 0")

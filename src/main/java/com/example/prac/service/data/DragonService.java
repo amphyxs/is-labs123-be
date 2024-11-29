@@ -9,9 +9,6 @@ import java.util.stream.StreamSupport;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.procedure.ProcedureCall;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.prac.dto.data.DragonDTO;
@@ -19,28 +16,21 @@ import com.example.prac.exceptions.NotEnoughRightsException;
 import com.example.prac.exceptions.ResourceNotFoundException;
 import com.example.prac.mappers.Mapper;
 import com.example.prac.model.auth.Role;
-import com.example.prac.model.auth.User;
 import com.example.prac.model.data.Dragon;
 import com.example.prac.repository.data.DragonRepository;
+import com.example.prac.service.auth.AuthenticationService;
 
 import jakarta.persistence.ParameterMode;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DragonService {
     private final DragonRepository dragonRepository;
     private final Mapper<Dragon, DragonDTO> dragonMapper;
     private final SessionFactory sessionFactory;
+    private final AuthenticationService authenticationService;
     private final Random r = new Random();
-
-    @Autowired
-    public DragonService(SessionFactory sessionFactory, Mapper<Dragon, DragonDTO> dragonMapper,
-            DragonRepository dragonRepository) {
-        this.sessionFactory = sessionFactory;
-        this.dragonRepository = dragonRepository;
-        this.dragonMapper = dragonMapper;
-    }
 
     public Integer getTotalAge() {
         try (Session session = sessionFactory.openSession()) {
@@ -94,7 +84,7 @@ public class DragonService {
     public DragonDTO save(DragonDTO dragonDTO) {
         Dragon dragon = dragonMapper.mapFrom(dragonDTO);
         dragon.setCreationDate(new Date());
-        dragon.setDragonOwner(getCurrentUser());
+        dragon.setDragonOwner(authenticationService.getCurrentUser());
 
         return dragonMapper.mapTo(dragonRepository.save(dragon));
     }
@@ -138,7 +128,7 @@ public class DragonService {
 
     public void delete(Long dragonId) {
         dragonRepository.findById(dragonId).ifPresentOrElse(dragon -> {
-            if ((getCurrentUser().getRole() == Role.ADMIN && dragon.getCanBeEditedByAdmin()) ||
+            if ((authenticationService.getCurrentUser().getRole() == Role.ADMIN && dragon.getCanBeEditedByAdmin()) ||
                     checkUserOwnsDragon(dragon)) {
                 dragonRepository.deleteById(dragonId);
             } else {
@@ -148,12 +138,7 @@ public class DragonService {
     }
 
     private boolean checkUserOwnsDragon(Dragon dragon) {
-        return getCurrentUser().getUsername().equals(dragon.getDragonOwner().getUsername());
-    }
-
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (User) authentication.getPrincipal();
+        return authenticationService.getCurrentUser().getUsername().equals(dragon.getDragonOwner().getUsername());
     }
 
     private String generatePassportId(int gangId) {

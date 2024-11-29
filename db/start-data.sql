@@ -46,3 +46,9 @@ INSERT INTO dragons (id, name, coordinates_id, creation_date, cave_id, killer_id
 VALUES
 (1, 'salat', 1, current_timestamp, 1, NULL, 228, 'BLACK', 'FIRE', 'EVIL', 1, 'Чебурек2000', TRUE),  -- Enums for Color.BLACK, DragonType.FIRE, DragonCharacter.EVIL
 (2, 'Bezzubik', 2, current_timestamp, 2, NULL, 666, 'GREEN', 'AIR', 'WISE', 2, 'Кот_Сибири', FALSE); -- Enums for Color.GREEN, DragonType.AIR, DragonCharacter.WISE
+
+INSERT INTO imports (status, owner_id, number_of_added_objects) VALUES
+    ('COMPLETED', 'Кот_Сибири', 15),
+    ('FAILED', 'Кот_Сибири', NULL),
+    ('COMPLETED', 'Чебурек2000', 42),
+    ('FAILED', 'Чебурек2000', NULL);
