@@ -1,0 +1,54 @@
+[
+  {
+    "name": "1733145963109",
+    "coordinates": {
+      "x": 13.37,
+      "y": 42
+    },
+    "creationDate": "2024-11-16T14:57:42.183+00:00",
+    "cave": {
+      "numberOfTreasures": 314
+    },
+    "killer": {
+      "name": "Dambldor",
+      "eyeColor": "GREEN",
+      "hairColor": "GREEN",
+      "location": {
+        "x": 404,
+        "y": 500.5,
+        "name": "Берлога_Забугорного"
+      },
+      "birthday": "1988-10-10T21:00:00.000+00:00",
+      "height": 170.2,
+      "passportID": 1733145963109
+    },
+    "age": 666,
+    "color": "BLACK",
+    "type": "FIRE",
+    "character": "EVIL",
+    "head": {
+      "size": 7
+    },
+    "canBeEditedByAdmin": true
+  },
+  {
+    "name": "1733145963109",
+    "coordinates": {
+      "x": 13.37,
+      "y": 42
+    },
+    "creationDate": "2024-11-16T14:57:42.183+00:00",
+    "cave": {
+      "numberOfTreasures": 314
+    },
+    "killer": null,
+    "age": 666,
+    "color": "BLACK",
+    "type": "FIRE",
+    "character": "EVIL",
+    "head": {
+      "size": 7
+    },
+    "canBeEditedByAdmin": true
+  }
+]

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.prac.dto.data.DragonDTO;
+import com.example.prac.exceptions.DragonWithSameNameException;
 import com.example.prac.exceptions.NotEnoughRightsException;
 import com.example.prac.exceptions.ResourceNotFoundException;
 import com.example.prac.service.data.DragonService;
@@ -28,8 +29,15 @@ public class DragonController {
     private final DragonService dragonService;
 
     @PostMapping
-    public ResponseEntity<DragonDTO> createDragon(@RequestBody DragonDTO dragonDTO) {
-        DragonDTO savedDragon = dragonService.save(dragonDTO);
+    public ResponseEntity<Object> createDragon(@RequestBody DragonDTO dragonDTO) {
+        DragonDTO savedDragon;
+
+        try {
+            savedDragon = dragonService.save(dragonDTO);
+        } catch (DragonWithSameNameException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDragon);
     }
 

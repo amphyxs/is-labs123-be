@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.prac.dto.data.DragonDTO;
 import com.example.prac.dto.data.OwnerDTO;
+import com.example.prac.exceptions.DragonWithSameNameException;
 import com.example.prac.exceptions.NotEnoughRightsException;
 import com.example.prac.exceptions.ResourceNotFoundException;
 import com.example.prac.mappers.Mapper;
@@ -97,7 +98,16 @@ public class DragonService {
         }
     }
 
-    public DragonDTO save(DragonDTO dragonDTO) {
+    public DragonDTO save(DragonDTO dragonDTO) throws DragonWithSameNameException {
+        System.out.printf("\n\n\n\n\nimporter: name %s passportID %s\n\n\n\n\n\n", dragonDTO.getName(),
+                dragonDTO.getKiller().getPassportID());
+
+        List<Dragon> existingDragonsWithSameName = dragonRepository.findByName(dragonDTO.getName());
+
+        if (!existingDragonsWithSameName.isEmpty()) {
+            throw new DragonWithSameNameException(dragonDTO.getName());
+        }
+
         Dragon dragon = dragonMapper.mapFrom(dragonDTO);
         dragon.setCreationDate(new Date());
         dragon.setDragonOwner(authenticationService.getCurrentUser());
