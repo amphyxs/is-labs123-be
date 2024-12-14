@@ -11,6 +11,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.procedure.ProcedureCall;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.prac.dto.data.DragonDTO;
@@ -101,12 +102,15 @@ public class DragonService {
         }
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public DragonDTO save(DragonDTO dragonDTO) throws DragonWithSameNameException {
         Dragon dragon = dragonMapper.mapFrom(dragonDTO);
         dragon.setCreationDate(new Date());
         dragon.setDragonOwner(authenticationService.getCurrentUser());
 
-        return dragonMapper.mapTo(checkAndSave(dragon));
+        validateDragon(dragon);
+
+        return dragonMapper.mapTo(dragonRepository.save(dragon));
     }
 
     public List<DragonDTO> findAllDragons() {
@@ -123,6 +127,7 @@ public class DragonService {
         return dragonRepository.existsById(dragonId);
     }
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public DragonDTO partialUpdate(Long dragonId, DragonDTO dragonDTO) {
         dragonDTO.setId(dragonId);
         return dragonRepository.findById(dragonId).map(existingDragon -> {
@@ -134,11 +139,10 @@ public class DragonService {
 
             Optional.ofNullable(dragonUpdate.getName()).ifPresent(existingDragon::setName);
             Optional.ofNullable(dragonUpdate.getCoordinates()).ifPresent(existingDragon::setCoordinates);
-            Optional.ofNullable(dragonUpdate.getCave()).ifPresent(c -> {
-                dragonCaveRepository.findById(c.getId()).ifPresentOrElse(existingDragon::setCave, () -> {
-                    throw new ResourceNotFoundException(DragonCave.class);
-                });
-            });
+            Optional.ofNullable(dragonUpdate.getCave()).ifPresent(
+                    c -> dragonCaveRepository.findById(c.getId()).ifPresentOrElse(existingDragon::setCave, () -> {
+                        throw new ResourceNotFoundException(DragonCave.class);
+                    }));
             Optional.ofNullable(dragonUpdate.getKiller()).ifPresent(existingDragon::setKiller);
             Optional.ofNullable(dragonUpdate.getAge()).ifPresent(existingDragon::setAge);
             Optional.ofNullable(dragonUpdate.getColor()).ifPresent(existingDragon::setColor);
@@ -146,7 +150,9 @@ public class DragonService {
             Optional.ofNullable(dragonUpdate.getCharacter()).ifPresent(existingDragon::setCharacter);
             Optional.ofNullable(dragonUpdate.getHead()).ifPresent(existingDragon::setHead);
 
-            return dragonMapper.mapTo(checkAndSave(existingDragon));
+            validateDragon(existingDragon);
+
+            return dragonMapper.mapTo(dragonRepository.save(existingDragon));
         }).orElseThrow(() -> new ResourceNotFoundException(Dragon.class));
     }
 
@@ -163,7 +169,7 @@ public class DragonService {
         });
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void saveImportedDragonsList(List<DragonDTO> dragons) {
         dragons.forEach(d -> {
             var coordinates = modelMapper.map(d.getCoordinates(), Coordinates.class);
@@ -187,7 +193,13 @@ public class DragonService {
             var userDTO = modelMapper.map(authenticationService.getCurrentUser(), OwnerDTO.class);
             d.setOwner(userDTO);
 
-            save(d);
+            Dragon dragon = dragonMapper.mapFrom(d);
+            dragon.setCreationDate(new Date());
+            dragon.setDragonOwner(authenticationService.getCurrentUser());
+
+            validateDragon(dragon);
+
+            dragonRepository.save(dragon);
         });
     }
 
@@ -203,7 +215,7 @@ public class DragonService {
         return r.nextInt(1000, 9999);
     }
 
-    private Dragon checkAndSave(Dragon entity) {
+    public void validateDragon(Dragon entity) {
         List<Dragon> existingDragonsWithSameName = dragonRepository.findByName(entity.getName()).stream()
                 .filter(d -> d.getId() != entity.getId()).toList();
 
@@ -217,7 +229,5 @@ public class DragonService {
         if (treasures > DragonService.MAX_DRAGON_CAVE_TREASURES) {
             throw new TooManyTreasuresInCaveException(entity.getName(), entity.getCave().getNumberOfTreasures());
         }
-
-        return dragonRepository.save(entity);
     }
 }
