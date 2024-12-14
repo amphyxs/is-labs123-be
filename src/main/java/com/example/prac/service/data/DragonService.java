@@ -18,6 +18,7 @@ import com.example.prac.dto.data.OwnerDTO;
 import com.example.prac.exceptions.DragonWithSameNameException;
 import com.example.prac.exceptions.NotEnoughRightsException;
 import com.example.prac.exceptions.ResourceNotFoundException;
+import com.example.prac.exceptions.TooManyTreasuresInCaveException;
 import com.example.prac.mappers.Mapper;
 import com.example.prac.model.auth.Role;
 import com.example.prac.model.data.Coordinates;
@@ -38,6 +39,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class DragonService {
+    public static final int MAX_DRAGON_CAVE_TREASURES = 666;
+
     private final DragonRepository dragonRepository;
     private final Mapper<Dragon, DragonDTO> dragonMapper;
     private final SessionFactory sessionFactory;
@@ -99,13 +102,13 @@ public class DragonService {
     }
 
     public DragonDTO save(DragonDTO dragonDTO) throws DragonWithSameNameException {
-        System.out.printf("\n\n\n\n\nimporter: name %s passportID %s\n\n\n\n\n\n", dragonDTO.getName(),
-                dragonDTO.getKiller().getPassportID());
-
         List<Dragon> existingDragonsWithSameName = dragonRepository.findByName(dragonDTO.getName());
 
         if (!existingDragonsWithSameName.isEmpty()) {
             throw new DragonWithSameNameException(dragonDTO.getName());
+        }
+        if (dragonDTO.getCave().getNumberOfTreasures() > MAX_DRAGON_CAVE_TREASURES) {
+            throw new TooManyTreasuresInCaveException(dragonDTO.getName(), dragonDTO.getCave().getNumberOfTreasures());
         }
 
         Dragon dragon = dragonMapper.mapFrom(dragonDTO);
