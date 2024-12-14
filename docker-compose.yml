@@ -48,6 +48,19 @@ services:
      - sonarqube
     network_mode: host
     env_file: "sonarqube.env"
+  
+  postgres-test-db:
+    image: postgres:14
+    container_name: postgres_test_db
+    environment:
+      POSTGRES_USER: testuser         
+      POSTGRES_PASSWORD: testpassword 
+      POSTGRES_DB: testdb            
+    profiles: [postgres-test-db]
+    volumes:
+      - ./db:/init
+    ports:
+      - "5432:5432"                    
 
 volumes:
   sonarqube_data:

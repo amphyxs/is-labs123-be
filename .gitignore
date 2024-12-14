@@ -34,3 +34,4 @@ build/
 
 .env
 sonarqube.env
+*.log

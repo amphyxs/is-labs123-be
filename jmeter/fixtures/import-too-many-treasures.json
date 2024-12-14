@@ -1,13 +1,13 @@
 [
   {
-    "name": "1733147522706",
+    "name": "Добряк",
     "coordinates": {
       "x": 13.37,
       "y": 42
     },
     "creationDate": "2024-11-16T14:57:42.183+00:00",
     "cave": {
-      "numberOfTreasures": 314
+      "numberOfTreasures": 666
     },
     "killer": {
       "name": "Dambldor",
@@ -20,7 +20,7 @@
       },
       "birthday": "1988-10-10T21:00:00.000+00:00",
       "height": 170.2,
-      "passportID": 1733147522708
+      "passportID": 5
     },
     "age": 666,
     "color": "BLACK",
@@ -32,14 +32,14 @@
     "canBeEditedByAdmin": true
   },
   {
-    "name": "1733147523795",
+    "name": "Хитрый_Жук",
     "coordinates": {
       "x": 13.37,
       "y": 42
     },
     "creationDate": "2024-11-16T14:57:42.183+00:00",
     "cave": {
-      "numberOfTreasures": 314
+      "numberOfTreasures": 667
     },
     "killer": {
       "name": "Dambldor",
@@ -52,7 +52,7 @@
       },
       "birthday": "1988-10-10T21:00:00.000+00:00",
       "height": 170.2,
-      "passportID": 1733147523796
+      "passportID": 6
     },
     "age": 666,
     "color": "BLACK",
