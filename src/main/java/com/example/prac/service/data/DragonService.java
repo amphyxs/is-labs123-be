@@ -102,20 +102,11 @@ public class DragonService {
     }
 
     public DragonDTO save(DragonDTO dragonDTO) throws DragonWithSameNameException {
-        List<Dragon> existingDragonsWithSameName = dragonRepository.findByName(dragonDTO.getName());
-
-        if (!existingDragonsWithSameName.isEmpty()) {
-            throw new DragonWithSameNameException(dragonDTO.getName());
-        }
-        if (dragonDTO.getCave().getNumberOfTreasures() > MAX_DRAGON_CAVE_TREASURES) {
-            throw new TooManyTreasuresInCaveException(dragonDTO.getName(), dragonDTO.getCave().getNumberOfTreasures());
-        }
-
         Dragon dragon = dragonMapper.mapFrom(dragonDTO);
         dragon.setCreationDate(new Date());
         dragon.setDragonOwner(authenticationService.getCurrentUser());
 
-        return dragonMapper.mapTo(dragonRepository.save(dragon));
+        return dragonMapper.mapTo(checkAndSave(dragon));
     }
 
     public List<DragonDTO> findAllDragons() {
@@ -143,7 +134,11 @@ public class DragonService {
 
             Optional.ofNullable(dragonUpdate.getName()).ifPresent(existingDragon::setName);
             Optional.ofNullable(dragonUpdate.getCoordinates()).ifPresent(existingDragon::setCoordinates);
-            Optional.ofNullable(dragonUpdate.getCave()).ifPresent(existingDragon::setCave);
+            Optional.ofNullable(dragonUpdate.getCave()).ifPresent(c -> {
+                dragonCaveRepository.findById(c.getId()).ifPresentOrElse(existingDragon::setCave, () -> {
+                    throw new ResourceNotFoundException(DragonCave.class);
+                });
+            });
             Optional.ofNullable(dragonUpdate.getKiller()).ifPresent(existingDragon::setKiller);
             Optional.ofNullable(dragonUpdate.getAge()).ifPresent(existingDragon::setAge);
             Optional.ofNullable(dragonUpdate.getColor()).ifPresent(existingDragon::setColor);
@@ -151,7 +146,7 @@ public class DragonService {
             Optional.ofNullable(dragonUpdate.getCharacter()).ifPresent(existingDragon::setCharacter);
             Optional.ofNullable(dragonUpdate.getHead()).ifPresent(existingDragon::setHead);
 
-            return dragonMapper.mapTo(dragonRepository.save(existingDragon));
+            return dragonMapper.mapTo(checkAndSave(existingDragon));
         }).orElseThrow(() -> new ResourceNotFoundException(Dragon.class));
     }
 
@@ -163,7 +158,9 @@ public class DragonService {
             } else {
                 throw new NotEnoughRightsException("User hasn't enough right to delete this object");
             }
-        }, () -> new ResourceNotFoundException(Dragon.class));
+        }, () -> {
+            throw new ResourceNotFoundException(Dragon.class);
+        });
     }
 
     @Transactional
@@ -204,5 +201,23 @@ public class DragonService {
 
     private int generateRandomDigitalID() {
         return r.nextInt(1000, 9999);
+    }
+
+    private Dragon checkAndSave(Dragon entity) {
+        List<Dragon> existingDragonsWithSameName = dragonRepository.findByName(entity.getName()).stream()
+                .filter(d -> d.getId() != entity.getId()).toList();
+
+        if (!existingDragonsWithSameName.isEmpty()) {
+            throw new DragonWithSameNameException(entity.getName());
+        }
+
+        Optional<DragonCave> cave = dragonCaveRepository.findById(entity.getCave().getId());
+        long treasures = cave.isPresent() ? cave.get().getNumberOfTreasures() : entity.getCave().getNumberOfTreasures();
+
+        if (treasures > DragonService.MAX_DRAGON_CAVE_TREASURES) {
+            throw new TooManyTreasuresInCaveException(entity.getName(), entity.getCave().getNumberOfTreasures());
+        }
+
+        return dragonRepository.save(entity);
     }
 }
