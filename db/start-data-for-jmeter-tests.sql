@@ -1,9 +1,10 @@
 -- Insert users with enum-based roles
 INSERT INTO users (username, password, role)
 VALUES
-('Чебурек2000', 'password123', 'USER'),       -- Role from Role.USER
-('Кот_Сибири', 'securepass', 'USER'),          -- Role from Role.USER
-('Батя_в_Здании', 'admin123', 'ADMIN');        -- Role from Role.ADMIN
+('Чебурек2000', 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f', 'USER'),       -- Role from Role.USER
+('Кот_Сибири', 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f', 'USER'),          -- Role from Role.USER
+('Батя_в_Здании', 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f', 'ADMIN'),        -- Role from Role.ADMIN
+('boss', 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f', 'ADMIN');        -- Role from Role.ADMIN
 
 -- Insert admin_request
 INSERT INTO admin_request (id, requester_id, is_approved)
@@ -21,7 +22,7 @@ VALUES
 INSERT INTO dragon_caves (id, number_of_treasures)
 VALUES
 (1, 111),        
-(2, 228);
+(2, 999);
 
 -- Insert dragon_heads
 INSERT INTO dragon_heads (id, size)
@@ -44,8 +45,10 @@ VALUES
 -- Insert dragons with enum-based fields
 INSERT INTO dragons (id, name, coordinates_id, creation_date, cave_id, killer_id, age, color, type, character, head_id, owner_id, can_be_edited_by_admin)
 VALUES
-(1, 'Bezzubik', 1, current_timestamp, 1, NULL, 228, 'BLACK', 'FIRE', 'EVIL', 1, 'Чебурек2000', TRUE),  -- Enums for Color.BLACK, DragonType.FIRE, DragonCharacter.EVIL
-(2, 'Жоский', 2, current_timestamp, 2, NULL, 666, 'GREEN', 'AIR', 'WISE', 2, 'Кот_Сибири', FALSE); -- Enums for Color.GREEN, DragonType.AIR, DragonCharacter.WISE
+(1, 'Bezzubik', 1, current_timestamp, 1, NULL, 228, 'BLACK', 'FIRE', 'EVIL', 1, 'boss', TRUE),  -- Enums for Color.BLACK, DragonType.FIRE, DragonCharacter.EVIL
+(2, 'Жоский', 2, current_timestamp, 2, NULL, 666, 'GREEN', 'AIR', 'WISE', 2, 'boss', FALSE), -- Enums for Color.GREEN, DragonType.AIR, DragonCharacter.WISE
+(3, 'Boss', 2, current_timestamp, 2, NULL, 666, 'GREEN', 'AIR', 'WISE', 2, 'boss', FALSE); -- Enums for Color.GREEN, DragonType.AIR, DragonCharacter.WISE
+
 
 INSERT INTO imports (status, owner_id, number_of_added_objects) VALUES
     ('COMPLETED', 'Кот_Сибири', 15),

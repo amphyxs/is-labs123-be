@@ -10,7 +10,7 @@ until nc -z -v -w30 localhost 5432; do
   echo "Waiting for PostgreSQL to start..."
   sleep 5
 done
-
+sleep 5
 echo "PostgreSQL is up and running on port 5432."
 
 # Step 3: Execute SQL script to initialize test data
