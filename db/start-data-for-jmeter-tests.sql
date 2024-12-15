@@ -46,8 +46,8 @@ VALUES
 INSERT INTO dragons (id, name, coordinates_id, creation_date, cave_id, killer_id, age, color, type, character, head_id, owner_id, can_be_edited_by_admin)
 VALUES
 (1, 'Bezzubik', 1, current_timestamp, 1, NULL, 228, 'BLACK', 'FIRE', 'EVIL', 1, 'boss', TRUE),  -- Enums for Color.BLACK, DragonType.FIRE, DragonCharacter.EVIL
-(2, 'Жоский', 2, current_timestamp, 2, NULL, 666, 'GREEN', 'AIR', 'WISE', 2, 'boss', FALSE), -- Enums for Color.GREEN, DragonType.AIR, DragonCharacter.WISE
-(3, 'Boss', 2, current_timestamp, 2, NULL, 666, 'GREEN', 'AIR', 'WISE', 2, 'boss', FALSE); -- Enums for Color.GREEN, DragonType.AIR, DragonCharacter.WISE
+(2, 'Жоский', 2, current_timestamp, 1, NULL, 666, 'GREEN', 'AIR', 'WISE', 2, 'boss', FALSE), -- Enums for Color.GREEN, DragonType.AIR, DragonCharacter.WISE
+(3, 'Boss', 2, current_timestamp, 1, NULL, 666, 'GREEN', 'AIR', 'WISE', 2, 'boss', FALSE); -- Enums for Color.GREEN, DragonType.AIR, DragonCharacter.WISE
 
 
 INSERT INTO imports (status, owner_id, number_of_added_objects) VALUES
