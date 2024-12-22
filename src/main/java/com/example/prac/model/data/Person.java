@@ -53,6 +53,6 @@ public class Person {
 
     @NotBlank(message = "Passport ID cannot be null or empty")
     @Size(max = 39, message = "Passport ID length must be no more than 39")
-    @Column(name = "passport_id", nullable = false, unique = true)
+    @Column(name = "passport_id", nullable = false, unique = false)
     private String passportID;
 }

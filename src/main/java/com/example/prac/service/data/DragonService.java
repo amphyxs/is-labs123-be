@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
 import org.hibernate.Session;
@@ -197,7 +199,7 @@ public class DragonService {
             dragon.setCreationDate(new Date());
             dragon.setDragonOwner(authenticationService.getCurrentUser());
 
-            validateDragon(dragon);
+            validateDragon(dragon, true);
 
             dragonRepository.save(dragon);
         });
@@ -216,11 +218,22 @@ public class DragonService {
     }
 
     public void validateDragon(Dragon entity) {
-        List<Dragon> existingDragonsWithSameName = dragonRepository.findByName(entity.getName()).stream()
+        validateDragon(entity, false);
+    }
+
+    public void validateDragon(Dragon entity, boolean isAddingIndexToSameName) {
+        List<Dragon> existingDragonsWithSameName = dragonRepository.findByBaseNameWithMaxIndex(entity.getName())
+                .stream()
                 .filter(d -> d.getId() != entity.getId()).toList();
 
         if (!existingDragonsWithSameName.isEmpty()) {
-            throw new DragonWithSameNameException(entity.getName());
+            if (isAddingIndexToSameName) {
+                entity.setName(
+                        addIndex(existingDragonsWithSameName.get(existingDragonsWithSameName.size() - 1).getName()));
+
+            } else {
+                throw new DragonWithSameNameException(entity.getName());
+            }
         }
 
         Optional<DragonCave> cave = dragonCaveRepository.findById(entity.getCave().getId());
@@ -228,6 +241,22 @@ public class DragonService {
 
         if (treasures > DragonService.MAX_DRAGON_CAVE_TREASURES) {
             throw new TooManyTreasuresInCaveException(entity.getName(), entity.getCave().getNumberOfTreasures());
+        }
+    }
+
+    private static String addIndex(String input) {
+        String regex = "(\\D+)(\\d*)$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        if (matcher.find()) {
+            String base = matcher.group(1); // Group 1 is the base part without the index
+            String indexPart = matcher.group(2); // Group 2 is the index part
+
+            int index = indexPart.isEmpty() ? 0 : Integer.parseInt(indexPart);
+            return base + (index + 1);
+        } else {
+            return input + "1";
         }
     }
 }

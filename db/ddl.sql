@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS people (
     location_id BIGINT,                                   -- Foreign key referencing the 'locations' table
     birthday TIMESTAMP,                                   -- Birthday column of type TIMESTAMP, can be NULL
     height DOUBLE PRECISION NOT NULL CHECK (height > 0),  -- Height column with a minimum constraint of 1, cannot be NULL
-    passport_id VARCHAR(39) NOT NULL UNIQUE,              -- Passport ID column, must be unique and cannot be NULL
+    passport_id VARCHAR(39) NOT NULL,              -- Passport ID column, must be unique and cannot be NULL
     CONSTRAINT fk_location FOREIGN KEY (location_id)      -- Foreign key constraint on location_id
         REFERENCES locations (id) ON DELETE SET NULL     -- If location is deleted, set location_id to NULL
 );
