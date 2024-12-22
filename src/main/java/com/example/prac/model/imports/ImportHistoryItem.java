@@ -35,4 +35,7 @@ public class ImportHistoryItem {
 
     @Column(name = "number_of_added_objects")
     private Integer numberOfAddedObjects;
+
+    @Column(name = "file_url", length = 1024)
+    private String fileUrl;
 }

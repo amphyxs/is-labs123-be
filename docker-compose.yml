@@ -1,25 +1,25 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
     image: postgres:14
     container_name: postgres_db
     env_file: ".env"
-    profiles: [main]
+    profiles: [main, only-storage]
     ports:
-      - "5433:5432"                    
+      - "5433:5432"
     volumes:
-      - pgdata5:/var/lib/postgresql/data # Persist database data
+      - pgdata6:/var/lib/postgresql/data # Persist database data
       - ./db:/db
-  
+
   app:
     build: .
     profiles: [main]
     depends_on:
-     - postgres
+      - postgres
     network_mode: host
     env_file: ".env"
-  
+
   sonarqube:
     image: sonarqube:latest
     container_name: sonarqube
@@ -31,7 +31,7 @@ services:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
-  
+
   sonarqube-db:
     image: postgres:latest
     container_name: sonar_db
@@ -39,32 +39,45 @@ services:
     env_file: "sonarqube.env"
     volumes:
       - sonar_db_data:/var/lib/postgresql/data
-    
+
   sonarqube-check-app:
     build:
       dockerfile: sonarqube.Dockerfile
     profiles: [sonarqube]
     depends_on:
-     - sonarqube
+      - sonarqube
     network_mode: host
     env_file: "sonarqube.env"
-  
+
   postgres-test-db:
     image: postgres:14
     container_name: postgres_test_db
     environment:
-      POSTGRES_USER: testuser         
-      POSTGRES_PASSWORD: testpassword 
-      POSTGRES_DB: testdb            
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: testdb
     profiles: [postgres-test-db]
     volumes:
       - ./db:/init
     ports:
-      - "5432:5432"                    
+      - "5432:5432"
+
+  minio:
+    profiles: [main, only-storage]
+    image: minio/minio:latest
+    container_name: minio
+    env_file: ".env"
+    ports:
+      - "${MINIO_PORT}:9000"
+    volumes:
+      - minio_data:/data
+    command: sh -c "mkdir -p /data/${MINIO_BUCKET_NAME} && /usr/bin/minio server --address :9000 /data"
+    entrypoint: sh -c "mkdir -p /data/${MINIO_BUCKET_NAME} && sleep 10 && /usr/bin/minio server --address :9000 /data"
 
 volumes:
   sonarqube_data:
   sonarqube_extensions:
   sonarqube_logs:
   sonar_db_data:
-  pgdata5:
+  pgdata6:
+  minio_data:

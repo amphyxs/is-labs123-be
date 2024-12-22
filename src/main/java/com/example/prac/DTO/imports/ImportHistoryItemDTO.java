@@ -10,4 +10,5 @@ public class ImportHistoryItemDTO {
     private String status;
     private OwnerDTO owner;
     private Long numberOfAddedObjects;
+    private String fileUrl;
 }

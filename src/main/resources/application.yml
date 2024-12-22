@@ -32,3 +32,9 @@ logging:
 
 server:
   port: 18123
+
+minio:
+  url: ${MINIO_URL:http://localhost:9000}
+  access-key: ${MINIO_ROOT_USER:minioadmin}
+  secret-key: ${MINIO_ROOT_PASSWORD:minioadmin}
+  bucket-name: ${MINIO_BUCKET_NAME:imports}

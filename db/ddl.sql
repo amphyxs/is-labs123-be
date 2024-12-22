@@ -86,6 +86,7 @@ CREATE TABLE IF NOT EXISTS imports (
     status VARCHAR(50) NOT NULL, -- Assuming ImportStatus is stored as a string
     owner_id VARCHAR(100) NOT NULL,    -- Foreign key referencing the User table
     number_of_added_objects INT NULL, -- Nullable in case of failure
+    file_url VARCHAR(1024),
     CONSTRAINT fk_owner FOREIGN KEY (owner_id) REFERENCES users(username)
 );
 
