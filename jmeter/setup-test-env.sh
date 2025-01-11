@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Step 1: Launch Docker Compose profile for postgres-test-db
+# Step 1: Launch Docker Compose profile for test-env
 echo "Shutting down Docker containers..."
-sudo docker compose -f ../docker-compose.yml --profile postgres-test-db down
+sudo docker compose -f ../docker-compose.yml --profile test-env down
 echo "Launching PostgreSQL test database via Docker Compose..."
-sudo docker compose -f ../docker-compose.yml --profile postgres-test-db up -d
+sudo docker compose -f ../docker-compose.yml --profile test-env up -d
 
 # Step 2: Wait for the PostgreSQL database to become available on port 5432
 echo "Waiting for PostgreSQL to be available on port 5432..."

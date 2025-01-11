@@ -14,6 +14,7 @@ import org.hibernate.procedure.ProcedureCall;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.prac.dto.data.DragonDTO;
@@ -129,7 +130,6 @@ public class DragonService {
         return dragonRepository.existsById(dragonId);
     }
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public DragonDTO partialUpdate(Long dragonId, DragonDTO dragonDTO) {
         dragonDTO.setId(dragonId);
         return dragonRepository.findById(dragonId).map(existingDragon -> {
@@ -171,7 +171,7 @@ public class DragonService {
         });
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
     public void saveImportedDragonsList(List<DragonDTO> dragons) {
         dragons.forEach(d -> {
             var coordinates = modelMapper.map(d.getCoordinates(), Coordinates.class);
@@ -229,7 +229,7 @@ public class DragonService {
         if (!existingDragonsWithSameName.isEmpty()) {
             if (isAddingIndexToSameName) {
                 entity.setName(
-                        addIndex(existingDragonsWithSameName.get(existingDragonsWithSameName.size() - 1).getName()));
+                        addIndex(existingDragonsWithSameName.get(0).getName()));
 
             } else {
                 throw new DragonWithSameNameException(entity.getName());

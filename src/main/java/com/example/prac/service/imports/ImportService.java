@@ -26,6 +26,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
+import io.minio.StatObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -86,12 +88,26 @@ public class ImportService {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setName("importTransaction");
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        def.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
         TransactionStatus dbTransaction = transactionManager.getTransaction(def);
-        String fileName = authenticationService.getCurrentUser().getUsername() + "_" + System.currentTimeMillis();
+        String fileName = authenticationService.getCurrentUser().getUsername() + "_" + System.currentTimeMillis()
+                + ".json";
 
         try {
-            dragonService.saveImportedDragonsList(dragons);
+            // Phase 1
+            boolean isDbReady = checkDatabaseReadiness(dragons);
+            boolean isMinioReady = checkMinioReadiness(file);
 
+            if (!isDbReady || !isMinioReady) {
+                throw new IllegalStateException("One or more resources are not ready to commit the transaction.");
+            }
+
+            // Phase 2
+            TransactionStatus dbSaveTransaction = transactionManager.getTransaction(def);
+            dragonService.saveImportedDragonsList(dragons);
+            transactionManager.commit(dbSaveTransaction);
+
+            boolean minioTransactionSuccess = false;
             InputStream fileInputStream = file.getInputStream();
             long fileSize = file.getSize();
             minioClient.putObject(
@@ -100,8 +116,11 @@ public class ImportService {
                             .object(fileName)
                             .stream(fileInputStream, fileSize, -1)
                             .build());
+            minioTransactionSuccess = true;
 
-            transactionManager.commit(dbTransaction);
+            if (minioTransactionSuccess) {
+                transactionManager.commit(dbTransaction);
+            }
 
             return minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
@@ -111,7 +130,39 @@ public class ImportService {
                             .build());
         } catch (Exception e) {
             transactionManager.rollback(dbTransaction);
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(getImportsMinioBucketName())
+                            .object(fileName)
+                            .build());
+            log.error("Transaction failed, rolling back: ", e);
             throw e;
+        }
+    }
+
+    private boolean checkDatabaseReadiness(List<DragonDTO> dragons) {
+        try {
+            if (dragons.isEmpty()) {
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("Database readiness check failed", e);
+            return false;
+        }
+    }
+
+    private boolean checkMinioReadiness(MultipartFile file) {
+        try {
+            minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(getImportsMinioBucketName())
+                            .object("test-readiness")
+                            .build());
+            return true;
+        } catch (Exception e) {
+            log.error("MinIO readiness check failed", e);
+            return false;
         }
     }
 }

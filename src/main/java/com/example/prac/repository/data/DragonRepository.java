@@ -14,7 +14,7 @@ public interface DragonRepository extends JpaRepository<Dragon, Long> {
 
     @Query("SELECT d FROM Dragon d WHERE d.name LIKE :baseName% ORDER BY " +
             "CASE " +
-            "WHEN LENGTH(d.name) = LENGTH(:baseName) THEN 1 " + // No index, treat as index 1
+            "WHEN LENGTH(d.name) = LENGTH(:baseName) THEN 0 " +
             "ELSE CAST(SUBSTRING(d.name, LENGTH(:baseName) + 1) AS INTEGER) END DESC")
     List<Dragon> findByBaseNameWithMaxIndex(String baseName);
 }

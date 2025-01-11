@@ -56,23 +56,24 @@ services:
       POSTGRES_USER: testuser
       POSTGRES_PASSWORD: testpassword
       POSTGRES_DB: testdb
-    profiles: [postgres-test-db]
+    profiles: [test-env]
     volumes:
       - ./db:/init
     ports:
       - "5432:5432"
 
   minio:
-    profiles: [main, only-storage]
+    profiles: [main, only-storage, test-env]
     image: minio/minio:latest
     container_name: minio
     env_file: ".env"
     ports:
       - "${MINIO_PORT}:9000"
+      - "${MINIO_UI_PORT}:9001"
     volumes:
       - minio_data:/data
-    command: sh -c "mkdir -p /data/${MINIO_BUCKET_NAME} && /usr/bin/minio server --address :9000 /data"
-    entrypoint: sh -c "mkdir -p /data/${MINIO_BUCKET_NAME} && sleep 10 && /usr/bin/minio server --address :9000 /data"
+    command: sh -c "mkdir -p /data/${MINIO_BUCKET_NAME} && /usr/bin/minio server --address :9000 --console-address ":9001" /data"
+    entrypoint: sh -c "mkdir -p /data/${MINIO_BUCKET_NAME} && sleep 10 && /usr/bin/minio server --address :9000 --console-address ":9001" /data"
 
 volumes:
   sonarqube_data:

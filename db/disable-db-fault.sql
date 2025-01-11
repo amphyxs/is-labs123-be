@@ -1,0 +1,1 @@
+DROP TRIGGER trigger_raise_error_on_insert  ON dragons;
