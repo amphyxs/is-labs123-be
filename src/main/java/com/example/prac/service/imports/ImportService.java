@@ -95,19 +95,16 @@ public class ImportService {
 
         try {
             // Phase 1
-            boolean isDbReady = checkDatabaseReadiness(dragons);
-            boolean isMinioReady = checkMinioReadiness(file);
+            boolean isDbReady = checkDatabaseReadiness();
+            boolean isMinioReady = checkMinioReadiness();
 
             if (!isDbReady || !isMinioReady) {
                 throw new IllegalStateException("One or more resources are not ready to commit the transaction.");
             }
 
             // Phase 2
-            TransactionStatus dbSaveTransaction = transactionManager.getTransaction(def);
             dragonService.saveImportedDragonsList(dragons);
-            transactionManager.commit(dbSaveTransaction);
 
-            boolean minioTransactionSuccess = false;
             InputStream fileInputStream = file.getInputStream();
             long fileSize = file.getSize();
             minioClient.putObject(
@@ -116,12 +113,8 @@ public class ImportService {
                             .object(fileName)
                             .stream(fileInputStream, fileSize, -1)
                             .build());
-            minioTransactionSuccess = true;
 
-            if (minioTransactionSuccess) {
-                transactionManager.commit(dbTransaction);
-            }
-
+            transactionManager.commit(dbTransaction);
             return minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .method(io.minio.http.Method.GET)
@@ -140,19 +133,15 @@ public class ImportService {
         }
     }
 
-    private boolean checkDatabaseReadiness(List<DragonDTO> dragons) {
+    private boolean checkDatabaseReadiness() {
         try {
-            if (dragons.isEmpty()) {
-                return false;
-            }
-            return true;
+            return dragonService.findAllDragons() != null;
         } catch (Exception e) {
-            log.error("Database readiness check failed", e);
             return false;
         }
     }
 
-    private boolean checkMinioReadiness(MultipartFile file) {
+    private boolean checkMinioReadiness() {
         try {
             minioClient.statObject(
                     StatObjectArgs.builder()
