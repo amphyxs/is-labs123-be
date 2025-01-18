@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.springframework.core.env.Environment;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -13,12 +14,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.prac.dto.data.DragonDTO;
 import com.example.prac.dto.imports.ImportHistoryItemDTO;
+import com.example.prac.exceptions.TransactionResourceIsNotReady;
 import com.example.prac.mappers.impl.ImportHistoryItemMapper;
 import com.example.prac.model.auth.Role;
+import com.example.prac.model.auth.User;
 import com.example.prac.model.imports.ImportHistoryItem;
 import com.example.prac.model.imports.ImportStatus;
+import com.example.prac.repository.auth.UserRepository;
 import com.example.prac.repository.imports.ImportHistoryRepository;
 import com.example.prac.service.auth.AuthenticationService;
+import com.example.prac.service.auth.JwtService;
 import com.example.prac.service.data.DragonService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,6 +48,7 @@ public class ImportService {
     private final MinioClient minioClient;
     private final PlatformTransactionManager transactionManager;
     private final Environment env;
+    private final UserRepository userRepository;
 
     public String getImportsMinioBucketName() {
         return env.getProperty("minio.bucket-name");
@@ -60,43 +66,50 @@ public class ImportService {
                 .toList();
     }
 
-    public ImportHistoryItemDTO importDragonsFromFile(MultipartFile file) {
+    public ImportHistoryItemDTO importDragonsFromFile(MultipartFile file, String username) throws Exception {
         ImportHistoryItem historyItem = new ImportHistoryItem();
 
-        historyItem.setStatus(ImportStatus.FAILED);
-        historyItem.setOwner(authenticationService.getCurrentUser());
+        try {
+            historyItem.setOwner(userRepository.findById(username).get());
+        } catch (Exception e) {
+            // TODO
+        }
 
         try {
             List<DragonDTO> dragons = objectMapper.readValue(
                     file.getInputStream(), new TypeReference<>() {
                     });
 
-            String fileUrl = commit(dragons, file);
+            String fileUrl = commit(dragons, file, username);
 
             historyItem.setFileUrl(fileUrl);
             historyItem.setStatus(ImportStatus.COMPLETED);
             historyItem.setNumberOfAddedObjects(dragons.size());
         } catch (Exception e) {
-            log.error("Import error", e);
+            historyItem.setStatus(ImportStatus.FAILED);
             historyItem.setNumberOfAddedObjects(null);
+
+            throw e;
         }
 
         return dtoMapper.mapTo(importHistoryRepository.save(historyItem));
     }
 
-    public String commit(List<DragonDTO> dragons, MultipartFile file) throws Exception {
+    public String commit(List<DragonDTO> dragons, MultipartFile file, String username) throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setName("importTransaction");
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         def.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
         TransactionStatus dbTransaction = transactionManager.getTransaction(def);
-        String fileName = authenticationService.getCurrentUser().getUsername() + "_" + System.currentTimeMillis()
+        String fileName = username + "_" + System.currentTimeMillis()
                 + ".json";
+        boolean isDbReady = true;
+        boolean isMinioReady = true;
 
         try {
             // Phase 1
-            boolean isDbReady = checkDatabaseReadiness();
-            boolean isMinioReady = checkMinioReadiness();
+            isDbReady = checkDatabaseReadiness();
+            isMinioReady = checkMinioReadiness();
 
             if (!isDbReady || !isMinioReady) {
                 throw new IllegalStateException("One or more resources are not ready to commit the transaction.");
@@ -128,8 +141,10 @@ public class ImportService {
                             .bucket(getImportsMinioBucketName())
                             .object(fileName)
                             .build());
-            log.error("Transaction failed, rolling back: ", e);
-            throw e;
+
+            String guilty = !isDbReady ? "DB" : "S3";
+
+            throw new TransactionResourceIsNotReady(guilty);
         }
     }
 

@@ -20,8 +20,18 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
     private static final String SECRET = "01ebc0bb5e1c88a20643ecf10712e286a367be48756f031df0b51e70911ed542";
 
+    public String extractUsernameFromAuthorizationHeader(String authorizationHeader) {
+        String token = authorizationHeader.substring(7);
+
+        return extractUsername(token);
+    }
+
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        try {
+            return extractClaim(token, Claims::getSubject);
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
