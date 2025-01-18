@@ -1,23 +1,19 @@
 package com.example.prac.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
-import com.example.prac.service.imports.ImportService;
-
-import lombok.AllArgsConstructor;
-
 @Component
-public class CustomTransactionManager extends JpaTransactionManager {
+public class SupressJdbcConnectivityErrorTransactionManager extends JpaTransactionManager {
     @Override
     protected void doBegin(Object transaction, TransactionDefinition definition) {
         try {
             super.doBegin(transaction, definition);
-        } catch (Exception e) {
-            return;
+        } catch (RuntimeException e) {
+            supressJdbcConnectionException(e);
         }
     }
 
@@ -25,18 +21,17 @@ public class CustomTransactionManager extends JpaTransactionManager {
     protected void doCleanupAfterCompletion(Object transaction) {
         try {
             super.doCleanupAfterCompletion(transaction);
-        } catch (Exception e) {
-            return;
+        } catch (RuntimeException e) {
+            supressJdbcConnectionException(e);
         }
-        // TODO Auto-generated method stub
     }
 
     @Override
     protected void doCommit(DefaultTransactionStatus status) {
         try {
             super.doCommit(status);
-        } catch (Exception e) {
-            return;
+        } catch (RuntimeException e) {
+            supressJdbcConnectionException(e);
         }
     }
 
@@ -44,8 +39,8 @@ public class CustomTransactionManager extends JpaTransactionManager {
     protected void doRollback(DefaultTransactionStatus status) {
         try {
             super.doRollback(status);
-        } catch (Exception e) {
-            return;
+        } catch (RuntimeException e) {
+            supressJdbcConnectionException(e);
         }
     }
 
@@ -53,7 +48,9 @@ public class CustomTransactionManager extends JpaTransactionManager {
     protected Object doGetTransaction() {
         try {
             return super.doGetTransaction();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            supressJdbcConnectionException(e);
+
             return null;
         }
 
@@ -63,8 +60,8 @@ public class CustomTransactionManager extends JpaTransactionManager {
     protected void doResume(Object transaction, Object suspendedResources) {
         try {
             super.doResume(transaction, suspendedResources);
-        } catch (Exception e) {
-            return;
+        } catch (RuntimeException e) {
+            supressJdbcConnectionException(e);
         }
 
     }
@@ -73,8 +70,8 @@ public class CustomTransactionManager extends JpaTransactionManager {
     protected void doSetRollbackOnly(DefaultTransactionStatus status) {
         try {
             super.doSetRollbackOnly(status);
-        } catch (Exception e) {
-            return;
+        } catch (RuntimeException e) {
+            supressJdbcConnectionException(e);
         }
     }
 
@@ -82,9 +79,20 @@ public class CustomTransactionManager extends JpaTransactionManager {
     protected Object doSuspend(Object transaction) {
         try {
             return super.doSuspend(transaction);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            supressJdbcConnectionException(e);
+
             return null;
         }
 
+    }
+
+    private void supressJdbcConnectionException(RuntimeException e) {
+        boolean isJDBCConnectionException = e.getCause() instanceof JDBCConnectionException;
+        boolean isIllegalStateException = e.getMessage().equals("No EntityManagerHolder available");
+
+        if (!isJDBCConnectionException && !isIllegalStateException) {
+            throw e;
+        }
     }
 }

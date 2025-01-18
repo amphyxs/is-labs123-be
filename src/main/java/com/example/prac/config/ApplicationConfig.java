@@ -89,6 +89,6 @@ public class ApplicationConfig {
     @Primary
     @Bean
     public PlatformTransactionManager transactionManager() {
-        return new CustomTransactionManager();
+        return new SupressJdbcConnectivityErrorTransactionManager();
     }
 }

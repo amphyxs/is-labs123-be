@@ -27,15 +27,12 @@ public class JwtService {
     }
 
     public String extractUsername(String token) {
-        try {
-            return extractClaim(token, Claims::getSubject);
-        } catch (Throwable e) {
-            return null;
-        }
+        return extractClaim(token, Claims::getSubject);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
+
         return claimsResolver.apply(claims);
     }
 
@@ -54,11 +51,13 @@ public class JwtService {
         if (userDetails instanceof User user) {
             claims.put("role", "ROLE_" + user.getRole().name());
         }
+
         return generateToken(claims, userDetails);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
+
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
@@ -82,6 +81,7 @@ public class JwtService {
 
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

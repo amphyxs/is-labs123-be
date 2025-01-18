@@ -29,7 +29,7 @@ public class ImportController {
         return ResponseEntity.ok(importService.getAllImportHistoryItems());
     }
 
-    @PostMapping
+    @PostMapping("/file")
     public ResponseEntity<ImportHistoryItemDTO> createImport(@RequestParam("file") MultipartFile file,
             @RequestHeader("Authorization") String authorizationHeader) throws Exception {
         String username = jwtService.extractUsernameFromAuthorizationHeader(authorizationHeader);

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,32 +44,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
+        username = jwtService.extractUsername(jwt);
 
         try {
-            username = jwtService.extractUsername(jwt);
-        } catch (Throwable e) {
-            return;
-        }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-                Claims claims = jwtService.extractAllClaims(jwt);
-                String role = claims.get("role", String.class);
-                if (!role.startsWith("ROLE_")) {
-                    role = "ROLE_" + role;
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    Claims claims = jwtService.extractAllClaims(jwt);
+                    String role = claims.get("role", String.class);
+                    if (!role.startsWith("ROLE_")) {
+                        role = "ROLE_" + role;
+                    }
+
+                    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            authorities);
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
-
-                List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
-
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        authorities);
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+        } catch (DataAccessResourceFailureException e) {
         }
 
         filterChain.doFilter(request, response);
